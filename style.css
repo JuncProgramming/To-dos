@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0e0a1a;
+  color: #f5dfff;
+  margin: 0;
+}
+
+#container {
+  width: clamp(320px, 50vw, 1280px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  text-align: center;
+  padding: clamp(10px, 2vw, 40px);
+}
+
+#item-form {
+  display: flex;
+  width: 100%;
+  margin: clamp(10px, 3vh, 30px) 0;
+  gap: clamp(5px, 1vw, 20px);
+}
+
+.form-input {
+  flex: 1;
+  height: clamp(70px, 8vh, 100px);
+  font-size: clamp(1rem, 2.5vw, 2rem);
+  color: #f5dfff;
+  background-color: #200f33;
+  border: none;
+  border-radius: clamp(8px, 1.2vw, 16px);
+  padding: clamp(8px, 1.5vw, 20px);
+}
+
+#submit {
+  width: clamp(70px, 8vh, 100px);
+  height: clamp(70px, 8vh, 100px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #200f33;
+  color: #f5dfff;
+  border-radius: clamp(8px, 1.2vw, 16px);
+  font-weight: 600;
+  border: none;
+  font-size: clamp(1.5rem, 3vw, 3rem);
+  padding: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+ul {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin: 20px 0;
+  display: flex;
+  gap: clamp(10px, 1.5vw, 30px);
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: clamp(80px, 10vh, 120px);
+  background-color: #200f33;
+  color: #f5dfff;
+  border-radius: clamp(8px, 1.2vw, 16px);
+  font-weight: 600;
+  padding: clamp(10px, 2vw, 20px);
+  list-style: none;
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  overflow-wrap: anywhere;
+}
+
+.todo-list-item,
+.done-list-item {
+  flex-grow: 1;
+  word-break: break-word;
+  text-align: start;
+}
+
+.icon-group {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.5vw, 20px);
+}
+
+button {
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+i {
+  color: #a661f5;
+  font-size: clamp(16px, 2vw, 24px); /* MIN: 16px, IDEAL: 2vw, MAX: 24px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
