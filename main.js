@@ -5,10 +5,13 @@ const doneHeaderText = document.getElementById('done-text');
 const form = document.getElementById('item-form');
 const textField = document.getElementById('item-input');
 const submitBtn = document.getElementById('submit');
+const clearBtn = document.getElementById('clear-all')
+const spacer = document.querySelector('hr')
+
 let isEditMode = false;
 let editTarget = null;
 
-const updateHeadersTexts = () => {
+const updateUI = () => {
   if (todoList.childElementCount === 0) {
     todoHeaderText.style.display = 'none';
   } else {
@@ -20,6 +23,13 @@ const updateHeadersTexts = () => {
   } else {
     doneHeaderText.style.display = 'block';
     doneHeaderText.innerText = `Done - ${doneList.childElementCount}`;
+  }
+  if (todoList.childElementCount === 0 && doneList.childElementCount === 0) {
+    clearBtn.style.display = 'none'
+    spacer.style.display = 'none'
+  } else {
+    clearBtn.style.display = 'block'
+    spacer.style.display = 'block'
   }
 };
 
@@ -65,7 +75,7 @@ const onAdd = () => {
     iconGroup.appendChild(penBtn);
 
     todoList.appendChild(todo);
-    updateHeadersTexts();
+    updateUI();
   }
 };
 
@@ -86,10 +96,10 @@ const onTodoClick = (e) => {
       icon.classList.replace('fa-circle-check', 'fa-rotate-left');
     }
     doneList.appendChild(todoLi);
-    updateHeadersTexts();
+    updateUI();
   } else if (e.target.classList.contains('fa-trash')) {
     todoLi.remove();
-    updateHeadersTexts();
+    updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
     isEditMode = true;
     editTarget = todoLi;
@@ -107,10 +117,10 @@ const onDoneClick = (e) => {
       icon.classList.replace('fa-rotate-left', 'fa-circle-check');
     }
     todoList.appendChild(doneLi);
-    updateHeadersTexts();
+    updateUI();
   } else if (e.target.classList.contains('fa-trash')) {
     doneLi.remove();
-    updateHeadersTexts();
+    updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
     isEditMode = true;
     editTarget = doneLi;
@@ -118,11 +128,26 @@ const onDoneClick = (e) => {
   }
 };
 
+const onClearAll = (e) => {
+  if (confirm('Are you sure you want to delete every item?')) {
+  todoList.querySelectorAll('li').forEach(item => {
+    item.remove()
+  });
+  doneList.querySelectorAll('li').forEach(item => {
+    item.remove()
+  });
+  updateUI();
+} else {
+  console.log(`Nothing's changed! ;)`)
+}
+}
+
 function init() {
   form.addEventListener('submit', onTodoAdd);
   todoList.addEventListener('click', onTodoClick);
   doneList.addEventListener('click', onDoneClick);
-  updateHeadersTexts();
+  clearBtn.addEventListener('click', onClearAll)
+  updateUI();
 }
 
 init();

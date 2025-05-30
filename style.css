@@ -55,6 +55,12 @@ body {
   line-height: 0;
 }
 
+hr {
+  width: 100%;
+  margin: clamp(20px, 5vh, 40px);
+  border-color: #7d3dc7;
+}
+
 ul {
   width: 100%;
   margin: 0;
@@ -98,6 +104,27 @@ button {
   margin: 0;
   padding: 0;
   cursor: pointer;
+}
+
+#todo-text,
+#done-text {
+  margin: clamp(10px, 3vh, 30px) 0
+}
+
+#clear-all {
+  margin: 20px 0;
+  display: flex;
+  gap: clamp(10px, 1.5vw, 30px);
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: clamp(80px, 10vh, 120px);
+  background-color: #8b51ce;;
+  color: #200f33;
+  border-radius: clamp(8px, 1.2vw, 16px);
+  font-weight: 700;
+  padding: clamp(10px, 2vw, 20px);
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
 }
 
 i {
