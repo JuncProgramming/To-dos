@@ -5,6 +5,8 @@ const doneHeaderText = document.getElementById('done-text');
 const form = document.getElementById('item-form');
 const textField = document.getElementById('item-input');
 const submitBtn = document.getElementById('submit');
+let isEditMode = false;
+let editTarget = null;
 
 const updateHeadersTexts = () => {
   if (todoList.childElementCount === 0) {
@@ -22,38 +24,49 @@ const updateHeadersTexts = () => {
 };
 
 const onAdd = () => {
-  const userText = textField.value;
-  if (userText.trim().length === 0) {
+  if (isEditMode) {
+    if (textField.value.trim().length === 0) {
+      return;
+    } else {
+      editTarget.firstChild.textContent = textField.value;
+    }
+    isEditMode = false;
+    editTarget = null;
     return;
+  } else {
+    const userText = textField.value;
+    if (userText.trim().length === 0) {
+      return;
+    }
+    const todo = document.createElement('li');
+    const text = document.createTextNode(userText);
+    const iconGroup = document.createElement('div');
+    iconGroup.classList.add('icon-group');
+    todo.classList.add('todo-list-item');
+    todo.appendChild(text);
+    todo.appendChild(iconGroup);
+
+    const checkBtn = document.createElement('button');
+    const check = document.createElement('i');
+    check.classList.add('fa-solid', 'fa-circle-check');
+    checkBtn.appendChild(check);
+    iconGroup.appendChild(checkBtn);
+
+    const trashBtn = document.createElement('button');
+    const trash = document.createElement('i');
+    trash.classList.add('fa-solid', 'fa-trash');
+    trashBtn.appendChild(trash);
+    iconGroup.appendChild(trashBtn);
+
+    const penBtn = document.createElement('button');
+    const pen = document.createElement('i');
+    pen.classList.add('fa-solid', 'fa-pen');
+    penBtn.appendChild(pen);
+    iconGroup.appendChild(penBtn);
+
+    todoList.appendChild(todo);
+    updateHeadersTexts();
   }
-  const todo = document.createElement('li');
-  const text = document.createTextNode(userText);
-  const iconGroup = document.createElement('div');
-  iconGroup.classList.add('icon-group');
-  todo.classList.add('todo-list-item');
-  todo.appendChild(text);
-  todo.appendChild(iconGroup);
-
-  const checkBtn = document.createElement('button');
-  const check = document.createElement('i');
-  check.classList.add('fa-solid', 'fa-circle-check');
-  checkBtn.appendChild(check);
-  iconGroup.appendChild(checkBtn);
-
-  const trashBtn = document.createElement('button');
-  const trash = document.createElement('i');
-  trash.classList.add('fa-solid', 'fa-trash');
-  trashBtn.appendChild(trash);
-  iconGroup.appendChild(trashBtn);
-
-  const penBtn = document.createElement('button');
-  const pen = document.createElement('i');
-  pen.classList.add('fa-solid', 'fa-pen');
-  penBtn.appendChild(pen);
-  iconGroup.appendChild(penBtn);
-
-  todoList.appendChild(todo);
-  updateHeadersTexts();
 };
 
 const onTodoAdd = (e) => {
@@ -78,7 +91,9 @@ const onTodoClick = (e) => {
     todoLi.remove();
     updateHeadersTexts();
   } else if (e.target.classList.contains('fa-pen')) {
-    // enter edit mode
+    isEditMode = true;
+    editTarget = todoLi;
+    textField.value = todoLi.innerText;
   }
 };
 
@@ -97,14 +112,16 @@ const onDoneClick = (e) => {
     doneLi.remove();
     updateHeadersTexts();
   } else if (e.target.classList.contains('fa-pen')) {
-    // enter edit mode
+    isEditMode = true;
+    editTarget = doneLi;
+    textField.value = doneLi.innerText;
   }
 };
-  
-  function init() {
+
+function init() {
   form.addEventListener('submit', onTodoAdd);
   todoList.addEventListener('click', onTodoClick);
-  doneList.addEventListener('click', onDoneClick)
+  doneList.addEventListener('click', onDoneClick);
   updateHeadersTexts();
 }
 
