@@ -7,31 +7,30 @@ const textField = document.getElementById('item-input');
 const submitBtn = document.getElementById('submit');
 
 const updateHeadersTexts = () => {
-  if(todoList.childElementCount === 0) {
-    todoHeaderText.style.display = 'none'
+  if (todoList.childElementCount === 0) {
+    todoHeaderText.style.display = 'none';
   } else {
-    todoHeaderText.style.display = 'block'
-    todoHeaderText.innerText = `To do - ${todoList.childElementCount}`
+    todoHeaderText.style.display = 'block';
+    todoHeaderText.innerText = `To do - ${todoList.childElementCount}`;
   }
-  if(doneList.childElementCount === 0) {
-    doneHeaderText.style.display = 'none'
+  if (doneList.childElementCount === 0) {
+    doneHeaderText.style.display = 'none';
   } else {
-    doneHeaderText.style.visibility = 'block'
-    doneHeaderText.innerText = `Done - ${doneList.childElementCount}`
+    doneHeaderText.style.display = 'block';
+    doneHeaderText.innerText = `Done - ${doneList.childElementCount}`;
   }
-  
-}
+};
 
-const onAdd = (itemClass, listType, icon) => {
+const onAdd = () => {
   const userText = textField.value;
   if (userText.trim().length === 0) {
-    return
+    return;
   }
   const todo = document.createElement('li');
   const text = document.createTextNode(userText);
   const iconGroup = document.createElement('div');
   iconGroup.classList.add('icon-group');
-  todo.classList.add(itemClass);
+  todo.classList.add('todo-list-item');
   todo.appendChild(text);
   todo.appendChild(iconGroup);
 
@@ -43,7 +42,7 @@ const onAdd = (itemClass, listType, icon) => {
 
   const trashBtn = document.createElement('button');
   const trash = document.createElement('i');
-  trash.classList.add('fa-solid', icon);
+  trash.classList.add('fa-solid', 'fa-trash');
   trashBtn.appendChild(trash);
   iconGroup.appendChild(trashBtn);
 
@@ -53,25 +52,60 @@ const onAdd = (itemClass, listType, icon) => {
   penBtn.appendChild(pen);
   iconGroup.appendChild(penBtn);
 
-  listType.appendChild(todo);
-  updateHeadersTexts()
+  todoList.appendChild(todo);
+  updateHeadersTexts();
 };
 
 const onTodoAdd = (e) => {
   e.preventDefault();
-  onAdd('todo-list-item', todoList, 'fa-trash');
+  onAdd();
   textField.value = '';
   textField.focus();
 };
 
-const onDoneAdd = () => {
-  onAdd('done-list-item', doneList, 'fa-rotate-left');
+const onTodoClick = (e) => {
+  const todoLi = e.target.closest('li');
+  if (e.target.classList.contains('fa-circle-check')) {
+    todoLi.remove();
+    todoLi.classList.replace('todo-list-item', 'done-list-item');
+    const icon = todoLi.querySelector('i.fa-circle-check');
+    if (icon) {
+      icon.classList.replace('fa-circle-check', 'fa-rotate-left');
+    }
+    doneList.appendChild(todoLi);
+    updateHeadersTexts();
+  } else if (e.target.classList.contains('fa-trash')) {
+    todoLi.remove();
+    updateHeadersTexts();
+  } else if (e.target.classList.contains('fa-pen')) {
+    // enter edit mode
+  }
 };
 
-
-function init() {
+const onDoneClick = (e) => {
+  const doneLi = e.target.closest('li');
+  if (e.target.classList.contains('fa-rotate-left')) {
+    doneLi.remove();
+    doneLi.classList.replace('done-list-item', 'todo-list-item');
+    const icon = doneLi.querySelector('i.fa-rotate-left');
+    if (icon) {
+      icon.classList.replace('fa-rotate-left', 'fa-circle-check');
+    }
+    todoList.appendChild(doneLi);
+    updateHeadersTexts();
+  } else if (e.target.classList.contains('fa-trash')) {
+    doneLi.remove();
+    updateHeadersTexts();
+  } else if (e.target.classList.contains('fa-pen')) {
+    // enter edit mode
+  }
+};
+  
+  function init() {
   form.addEventListener('submit', onTodoAdd);
-  updateHeadersTexts()
+  todoList.addEventListener('click', onTodoClick);
+  doneList.addEventListener('click', onDoneClick)
+  updateHeadersTexts();
 }
 
-init()
+init();
