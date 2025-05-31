@@ -5,8 +5,8 @@ const doneHeaderText = document.getElementById('done-text');
 const form = document.getElementById('item-form');
 const textField = document.getElementById('item-input');
 const submitBtn = document.getElementById('submit');
-const clearBtn = document.getElementById('clear-all')
-const spacer = document.querySelector('hr')
+const clearBtn = document.getElementById('clear-all');
+const spacer = document.querySelector('hr');
 
 let isEditMode = false;
 let editTarget = null;
@@ -25,15 +25,15 @@ const updateUI = () => {
     doneHeaderText.innerText = `Done - ${doneList.childElementCount}`;
   }
   if (todoList.childElementCount === 0 && doneList.childElementCount === 0) {
-    clearBtn.style.display = 'none'
-    spacer.style.display = 'none'
+    clearBtn.style.display = 'none';
+    spacer.style.display = 'none';
   } else {
-    clearBtn.style.display = 'block'
-    spacer.style.display = 'block'
+    clearBtn.style.display = 'block';
+    spacer.style.display = 'block';
   }
 };
 
-const onAdd = () => {
+const addOrEditItem = () => {
   if (isEditMode) {
     if (textField.value.trim().length === 0) {
       return;
@@ -42,6 +42,8 @@ const onAdd = () => {
     }
     isEditMode = false;
     editTarget = null;
+    textField.value = '';
+    updateUI();
     return;
   } else {
     const userText = textField.value;
@@ -73,20 +75,21 @@ const onAdd = () => {
     pen.classList.add('fa-solid', 'fa-pen');
     penBtn.appendChild(pen);
     iconGroup.appendChild(penBtn);
-
     todoList.appendChild(todo);
+        
+    textField.value = '';
     updateUI();
   }
 };
 
-const onTodoAdd = (e) => {
+const handleFormSubmit = (e) => {
   e.preventDefault();
-  onAdd();
+  addOrEditItem();
   textField.value = '';
   textField.focus();
 };
 
-const onTodoClick = (e) => {
+const handleTodoListClick = (e) => {
   const todoLi = e.target.closest('li');
   if (e.target.classList.contains('fa-circle-check')) {
     todoLi.remove();
@@ -107,7 +110,7 @@ const onTodoClick = (e) => {
   }
 };
 
-const onDoneClick = (e) => {
+const handleDoneListClick = (e) => {
   const doneLi = e.target.closest('li');
   if (e.target.classList.contains('fa-rotate-left')) {
     doneLi.remove();
@@ -128,25 +131,25 @@ const onDoneClick = (e) => {
   }
 };
 
-const onClearAll = (e) => {
+const handleClearAllClick = (e) => {
   if (confirm('Are you sure you want to delete every item?')) {
-  todoList.querySelectorAll('li').forEach(item => {
-    item.remove()
-  });
-  doneList.querySelectorAll('li').forEach(item => {
-    item.remove()
-  });
-  updateUI();
-} else {
-  console.log(`Nothing's changed! ;)`)
-}
-}
+    todoList.querySelectorAll('li').forEach((item) => {
+      item.remove();
+    });
+    doneList.querySelectorAll('li').forEach((item) => {
+      item.remove();
+    });
+    updateUI();
+  } else {
+    console.log(`Nothing's changed! ;)`);
+  }
+};
 
 function init() {
-  form.addEventListener('submit', onTodoAdd);
-  todoList.addEventListener('click', onTodoClick);
-  doneList.addEventListener('click', onDoneClick);
-  clearBtn.addEventListener('click', onClearAll)
+  form.addEventListener('submit', handleFormSubmit);
+  todoList.addEventListener('click', handleTodoListClick);
+  doneList.addEventListener('click', handleDoneListClick);
+  clearBtn.addEventListener('click', handleClearAllClick);
   updateUI();
 }
 
