@@ -12,25 +12,17 @@ let isEditMode = false;
 let editTarget = null;
 
 const updateUI = () => {
-  if (todoList.childElementCount === 0) {
-    todoHeaderText.style.display = 'none';
-  } else {
-    todoHeaderText.style.display = 'block';
-    todoHeaderText.innerText = `To do - ${todoList.childElementCount}`;
-  }
-  if (doneList.childElementCount === 0) {
-    doneHeaderText.style.display = 'none';
-  } else {
-    doneHeaderText.style.display = 'block';
-    doneHeaderText.innerText = `Done - ${doneList.childElementCount}`;
-  }
-  if (todoList.childElementCount === 0 && doneList.childElementCount === 0) {
-    clearBtn.style.display = 'none';
-    spacer.style.display = 'none';
-  } else {
-    clearBtn.style.display = 'block';
-    spacer.style.display = 'block';
-  }
+  todoList.childElementCount === 0
+    ? (todoHeaderText.style.display = 'none')
+    : (todoHeaderText.style.display = 'block');
+  todoHeaderText.innerText = `To do - ${todoList.childElementCount}`;
+  doneList.childElementCount === 0
+    ? (doneHeaderText.style.display = 'none')
+    : (doneHeaderText.style.display = 'block');
+  doneHeaderText.innerText = `Done - ${doneList.childElementCount}`;
+  todoList.childElementCount === 0 && doneList.childElementCount === 0
+    ? ((clearBtn.style.display = 'none'), (spacer.style.display = 'none'))
+    : ((clearBtn.style.display = 'block'), (spacer.style.display = 'block'));
 };
 
 const addOrEditItem = () => {
@@ -50,6 +42,9 @@ const addOrEditItem = () => {
     if (userText.trim().length === 0) {
       return;
     }
+    const items = getItems();
+    items.push({ text: userText, status: 'todo' });
+    saveItems(items);
     const todo = document.createElement('li');
     const text = document.createTextNode(userText);
     const iconGroup = document.createElement('div');
@@ -76,7 +71,7 @@ const addOrEditItem = () => {
     penBtn.appendChild(pen);
     iconGroup.appendChild(penBtn);
     todoList.appendChild(todo);
-        
+
     textField.value = '';
     updateUI();
   }
@@ -89,6 +84,59 @@ const handleFormSubmit = (e) => {
   textField.focus();
 };
 
+const saveItems = (items) => {
+  localStorage.setItem('items', JSON.stringify(items));
+};
+
+const getItems = () => {
+  const items = localStorage.getItem('items');
+  return items ? JSON.parse(items) : [];
+};
+
+const loadItems = () => {
+  const items = getItems();
+
+  items.forEach((item) => {
+    const li = document.createElement('li');
+    li.textContent = item.text;
+    li.classList.add(
+      item.status === 'todo' ? 'todo-list-item' : 'done-list-item'
+    );
+
+    const iconGroup = document.createElement('div');
+    iconGroup.classList.add('icon-group');
+
+    const checkBtn = document.createElement('button');
+    const check = document.createElement('i');
+    check.classList.add(
+      'fa-solid',
+      item.status === 'todo' ? 'fa-circle-check' : 'fa-rotate-left'
+    );
+    checkBtn.appendChild(check);
+    iconGroup.appendChild(checkBtn);
+
+    const trashBtn = document.createElement('button');
+    const trash = document.createElement('i');
+    trash.classList.add('fa-solid', 'fa-trash');
+    trashBtn.appendChild(trash);
+    iconGroup.appendChild(trashBtn);
+
+    const penBtn = document.createElement('button');
+    const pen = document.createElement('i');
+    pen.classList.add('fa-solid', 'fa-pen');
+    penBtn.appendChild(pen);
+    iconGroup.appendChild(penBtn);
+
+    li.appendChild(iconGroup);
+
+    item.status === 'done'
+      ? doneList.appendChild(li)
+      : todoList.appendChild(li);
+  });
+
+  updateUI();
+};
+
 const handleTodoListClick = (e) => {
   const todoLi = e.target.closest('li');
   if (e.target.classList.contains('fa-circle-check')) {
@@ -99,9 +147,18 @@ const handleTodoListClick = (e) => {
       icon.classList.replace('fa-circle-check', 'fa-rotate-left');
     }
     doneList.appendChild(todoLi);
+    const text = todoLi.firstChild.textContent;
+    items = items.map((item) =>
+      item.text === text ? { ...item, status: 'done' } : item
+    );
+    saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-trash')) {
+    const text = todoLi.firstChild.textContent;
     todoLi.remove();
+    let items = getItems();
+    items = items.filter((item) => item.text !== text);
+    saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
     isEditMode = true;
@@ -120,9 +177,18 @@ const handleDoneListClick = (e) => {
       icon.classList.replace('fa-rotate-left', 'fa-circle-check');
     }
     todoList.appendChild(doneLi);
+    const text = doneLi.firstChild.textContent;
+    items = items.map((item) =>
+      item.text === text ? { ...item, status: 'todo' } : item
+    );
+    saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-trash')) {
+    const text = doneLi.firstChild.textContent;
     doneLi.remove();
+    let items = getItems();
+    items = items.filter((item) => item.text !== text);
+    saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
     isEditMode = true;
@@ -146,6 +212,7 @@ const handleClearAllClick = (e) => {
 };
 
 function init() {
+  loadItems();
   form.addEventListener('submit', handleFormSubmit);
   todoList.addEventListener('click', handleTodoListClick);
   doneList.addEventListener('click', handleDoneListClick);
