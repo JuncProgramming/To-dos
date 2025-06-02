@@ -10,6 +10,8 @@ const spacer = document.querySelector('hr');
 
 let isEditMode = false;
 let editTarget = null;
+let originalId = null;
+let originalText = null;
 
 const updateUI = () => {
   todoList.childElementCount === 0
@@ -26,54 +28,41 @@ const updateUI = () => {
 };
 
 const addOrEditItem = () => {
+  const items = getItems();
   if (isEditMode) {
-    if (textField.value.trim().length === 0) {
+    const newText = textField.value.trim();
+    if (newText.length === 0) {
+      isEditMode = false;
+      editTarget = null;
+      originalId = null;
+      originalText = null;
+      textField.value = '';
+      updateUI();
       return;
-    } else {
-      editTarget.firstChild.textContent = textField.value;
     }
+
+    const updatedItems = items.map((item) =>
+      item.id == originalId ? { ...item, text: newText } : item
+    );
+
+    saveItems(updatedItems);
+    loadItems();
+
     isEditMode = false;
     editTarget = null;
+    originalId = null;
+    originalText = null;
     textField.value = '';
-    updateUI();
     return;
   } else {
-    const userText = textField.value;
-    if (userText.trim().length === 0) {
-      return;
-    }
-    const items = getItems();
-    items.push({ text: userText, status: 'todo' });
+    const userText = textField.value.trim();
+    if (userText.length === 0) return;
+
+    items.push({ id: Date.now(), text: userText, status: 'todo' });
     saveItems(items);
-    const todo = document.createElement('li');
-    const text = document.createTextNode(userText);
-    const iconGroup = document.createElement('div');
-    iconGroup.classList.add('icon-group');
-    todo.classList.add('todo-list-item');
-    todo.appendChild(text);
-    todo.appendChild(iconGroup);
-
-    const checkBtn = document.createElement('button');
-    const check = document.createElement('i');
-    check.classList.add('fa-solid', 'fa-circle-check');
-    checkBtn.appendChild(check);
-    iconGroup.appendChild(checkBtn);
-
-    const trashBtn = document.createElement('button');
-    const trash = document.createElement('i');
-    trash.classList.add('fa-solid', 'fa-trash');
-    trashBtn.appendChild(trash);
-    iconGroup.appendChild(trashBtn);
-
-    const penBtn = document.createElement('button');
-    const pen = document.createElement('i');
-    pen.classList.add('fa-solid', 'fa-pen');
-    penBtn.appendChild(pen);
-    iconGroup.appendChild(penBtn);
-    todoList.appendChild(todo);
+    loadItems();
 
     textField.value = '';
-    updateUI();
   }
 };
 
@@ -94,11 +83,18 @@ const getItems = () => {
 };
 
 const loadItems = () => {
+  todoList.querySelectorAll('li').forEach((item) => {
+    item.remove();
+  });
+  doneList.querySelectorAll('li').forEach((item) => {
+    item.remove();
+  });
   const items = getItems();
 
   items.forEach((item) => {
     const li = document.createElement('li');
     li.textContent = item.text;
+    li.dataset.id = item.id;
     li.classList.add(
       item.status === 'todo' ? 'todo-list-item' : 'done-list-item'
     );
@@ -129,9 +125,9 @@ const loadItems = () => {
 
     li.appendChild(iconGroup);
 
-    item.status === 'done'
-      ? doneList.appendChild(li)
-      : todoList.appendChild(li);
+    item.status === 'todo'
+      ? todoList.appendChild(li)
+      : doneList.appendChild(li);
   });
 
   updateUI();
@@ -139,6 +135,8 @@ const loadItems = () => {
 
 const handleTodoListClick = (e) => {
   const todoLi = e.target.closest('li');
+  const id = todoLi.dataset.id;
+  let items = getItems();
   if (e.target.classList.contains('fa-circle-check')) {
     todoLi.remove();
     todoLi.classList.replace('todo-list-item', 'done-list-item');
@@ -147,28 +145,29 @@ const handleTodoListClick = (e) => {
       icon.classList.replace('fa-circle-check', 'fa-rotate-left');
     }
     doneList.appendChild(todoLi);
-    const text = todoLi.firstChild.textContent;
     items = items.map((item) =>
-      item.text === text ? { ...item, status: 'done' } : item
+      item.id == id ? { ...item, status: 'done' } : item
     );
     saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-trash')) {
-    const text = todoLi.firstChild.textContent;
     todoLi.remove();
     let items = getItems();
-    items = items.filter((item) => item.text !== text);
+    items = items.filter((item) => item.id != id);
     saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
+    originalId = id;
     isEditMode = true;
     editTarget = todoLi;
-    textField.value = todoLi.innerText;
+    textField.value = todoLi.firstChild.textContent;
   }
 };
 
 const handleDoneListClick = (e) => {
   const doneLi = e.target.closest('li');
+  const id = doneLi.dataset.id;
+  let items = getItems();
   if (e.target.classList.contains('fa-rotate-left')) {
     doneLi.remove();
     doneLi.classList.replace('done-list-item', 'todo-list-item');
@@ -177,27 +176,26 @@ const handleDoneListClick = (e) => {
       icon.classList.replace('fa-rotate-left', 'fa-circle-check');
     }
     todoList.appendChild(doneLi);
-    const text = doneLi.firstChild.textContent;
     items = items.map((item) =>
-      item.text === text ? { ...item, status: 'todo' } : item
+      item.id == id ? { ...item, status: 'todo' } : item
     );
     saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-trash')) {
-    const text = doneLi.firstChild.textContent;
     doneLi.remove();
     let items = getItems();
-    items = items.filter((item) => item.text !== text);
+    items = items.filter((item) => item.id != id);
     saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
+    originalId = id;
     isEditMode = true;
     editTarget = doneLi;
-    textField.value = doneLi.innerText;
+    textField.value = doneLi.firstChild.textContent;
   }
 };
 
-const handleClearAllClick = (e) => {
+const handleClearAllClick = () => {
   if (confirm('Are you sure you want to delete every item?')) {
     todoList.querySelectorAll('li').forEach((item) => {
       item.remove();
@@ -205,6 +203,7 @@ const handleClearAllClick = (e) => {
     doneList.querySelectorAll('li').forEach((item) => {
       item.remove();
     });
+    localStorage.removeItem('items');
     updateUI();
   } else {
     console.log(`Nothing's changed! ;)`);
@@ -217,7 +216,6 @@ function init() {
   todoList.addEventListener('click', handleTodoListClick);
   doneList.addEventListener('click', handleDoneListClick);
   clearBtn.addEventListener('click', handleClearAllClick);
-  updateUI();
 }
 
 init();
