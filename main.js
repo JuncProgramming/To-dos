@@ -5,6 +5,7 @@ const doneHeaderText = document.getElementById('done-text');
 const form = document.getElementById('item-form');
 const textField = document.getElementById('item-input');
 const submitBtn = document.getElementById('submit');
+const icon = submitBtn.querySelector('i');
 const clearBtn = document.getElementById('clear-all');
 const spacer = document.querySelector('hr');
 
@@ -28,8 +29,12 @@ const updateUI = () => {
 };
 
 const addOrEditItem = () => {
+  const icon = submitBtn.querySelector('i');
   const items = getItems();
   if (isEditMode) {
+    icon.style.color = '#8b51ce';
+    submitBtn.style.backgroundColor = '#200f33';
+    icon.classList.replace('fa-plus', 'fa-pen-to-square');
     const newText = textField.value.trim();
     if (newText.length === 0) {
       isEditMode = false;
@@ -37,6 +42,9 @@ const addOrEditItem = () => {
       originalId = null;
       originalText = null;
       textField.value = '';
+      icon.style.color = '#8b51ce';
+      submitBtn.style.backgroundColor = '#200f33';
+      icon.classList.replace('fa-pen-to-square', 'fa-plus');
       updateUI();
       return;
     }
@@ -47,7 +55,9 @@ const addOrEditItem = () => {
 
     saveItems(updatedItems);
     loadItems();
-
+    icon.style.color = '#8b51ce';
+    submitBtn.style.backgroundColor = '#200f33';
+    icon.classList.replace('fa-pen-to-square', 'fa-plus');
     isEditMode = false;
     editTarget = null;
     originalId = null;
@@ -62,6 +72,9 @@ const addOrEditItem = () => {
     saveItems(items);
     loadItems();
 
+    icon.style.color = '#8b51ce';
+    submitBtn.style.backgroundColor = '#200f33';
+    icon.classList.replace('fa-pen-to-square', 'fa-plus');
     textField.value = '';
   }
 };
@@ -157,6 +170,9 @@ const handleTodoListClick = (e) => {
     saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
+    icon.style.color = '#200f33';
+    submitBtn.style.backgroundColor = '#8b51ce';
+    icon.classList.replace('fa-plus', 'fa-pen-to-square');
     originalId = id;
     isEditMode = true;
     editTarget = todoLi;
@@ -188,6 +204,9 @@ const handleDoneListClick = (e) => {
     saveItems(items);
     updateUI();
   } else if (e.target.classList.contains('fa-pen')) {
+    icon.style.color = '#200f33';
+    submitBtn.style.backgroundColor = '#8b51ce';
+    icon.classList.replace('fa-plus', 'fa-pen-to-square');
     originalId = id;
     isEditMode = true;
     editTarget = doneLi;
